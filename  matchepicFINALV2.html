@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MatchEPIC — EPIC Lab ITAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800&family=Barlow+Condensed:wght@700;800;900&display=swap" rel="stylesheet"/>
+<style>
+:root{--green:rgb(0,76,29);--green-mid:rgb(0,96,37);--green-lime:#7dc242;--green-light:#e8f5e0;--white:#ffffff;--gray-bg:#f7f7f7;--text:#1a1a1a;--text-mid:#444;--muted:#888;--border:#e0e0e0;--radius:6px;--radius-lg:14px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden;}
+.top-bar{background:var(--green);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:44px;position:fixed;top:0;left:0;right:0;z-index:200;}
+.top-bar-links{display:flex;}
+.top-bar-link{font-size:0.78rem;font-weight:600;color:rgba(255,255,255,0.85);padding:0 1.1rem;height:44px;display:flex;align-items:center;border-right:1px solid rgba(255,255,255,0.12);cursor:pointer;transition:background 0.15s;}
+.top-bar-link:first-child{border-left:1px solid rgba(255,255,255,0.12);}
+.top-bar-link:hover{background:rgba(255,255,255,0.1);}
+.top-bar-right{font-size:0.72rem;font-weight:700;color:var(--green-lime);letter-spacing:0.08em;text-transform:uppercase;}
+nav{position:fixed;top:44px;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:64px;background:var(--white);border-bottom:2px solid var(--border);box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.nav-logo{
+  display:flex;
+  align-items:center;
+}
+
+.nav-logo-image{
+  height:44px;
+  width:auto;
+  display:block;
+}
+.nav-links{display:flex;align-items:center;}
+.nav-link{font-size:0.82rem;font-weight:600;color:var(--text-mid);padding:0 0.9rem;height:64px;display:flex;align-items:center;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all 0.15s;white-space:nowrap;}
+.nav-link:hover,.nav-link.active{color:var(--green);border-bottom-color:var(--green-lime);}
+.nav-badge{font-size:0.7rem;font-weight:700;background:var(--green);color:var(--white);padding:5px 12px;border-radius:2px;letter-spacing:0.05em;text-transform:uppercase;white-space:nowrap;}
+.hero{margin-top:108px;min-height:calc(100vh - 108px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:5rem 1.5rem 4rem;position:relative;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(160deg,var(--green-light) 0%,var(--white) 55%,#f0fae8 100%);z-index:0;}
+.hero-shape-1{position:absolute;top:-60px;right:-80px;width:420px;height:420px;background:var(--green);opacity:0.06;border-radius:50%;z-index:0;}
+.hero-shape-2{position:absolute;bottom:-80px;left:-60px;width:300px;height:300px;background:var(--green-lime);opacity:0.08;border-radius:50%;z-index:0;}
+.hero-shape-3{position:absolute;top:30%;left:5%;width:80px;height:80px;background:var(--green);opacity:0.05;transform:rotate(45deg);z-index:0;}
+.hero-shape-4{position:absolute;bottom:20%;right:8%;width:50px;height:50px;background:var(--green-lime);opacity:0.12;transform:rotate(20deg);z-index:0;}
+.hero-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;}
+.hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:0.72rem;font-weight:700;background:var(--white);border:1px solid rgba(0,76,29,0.2);border-radius:2px;padding:5px 14px;color:var(--green);margin-bottom:1.5rem;letter-spacing:0.1em;text-transform:uppercase;animation:fadeUp 0.5s ease both;box-shadow:0 2px 8px rgba(0,76,29,0.08);}
+.hero-tag::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--green-lime);}
+.hero h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:900;line-height:0.95;letter-spacing:-0.01em;color:var(--text);max-width:860px;text-transform:uppercase;animation:fadeUp 0.5s 0.1s ease both;}
+.hero h1 .lime{color:var(--green-lime);}
+.hero h1 .dark{color:var(--green);}
+.hero-sub{margin-top:1.5rem;font-size:1rem;color:var(--text-mid);max-width:520px;line-height:1.7;animation:fadeUp 0.5s 0.2s ease both;}
+.hero-stats{display:flex;gap:0;margin-top:3rem;border:1px solid rgba(0,76,29,0.15);border-radius:var(--radius);overflow:hidden;animation:fadeUp 0.5s 0.3s ease both;background:var(--white);box-shadow:0 4px 16px rgba(0,76,29,0.08);}
+.stat{padding:1.25rem 2rem;text-align:center;border-right:1px solid var(--border);}
+.stat:last-child{border-right:none;}
+.stat-num{font-family:'Barlow Condensed',sans-serif;font-size:2.2rem;font-weight:900;color:var(--green);display:block;line-height:1;}
+.stat-label{font-size:0.68rem;color:var(--muted);font-weight:600;letter-spacing:0.08em;text-transform:uppercase;margin-top:4px;display:block;}
+.hero-cta{margin-top:2.5rem;display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;animation:fadeUp 0.5s 0.4s ease both;}
+.btn-primary{background:var(--green);color:var(--white);padding:0.9rem 2.2rem;border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.92rem;font-weight:800;border:none;cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;}
+.btn-primary:hover{background:var(--green-mid);transform:translateY(-1px);}
+.btn-secondary{background:var(--white);color:var(--green);padding:0.9rem 2.2rem;border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.92rem;font-weight:700;border:2px solid var(--green);cursor:pointer;transition:all 0.2s;letter-spacing:0.04em;text-transform:uppercase;}
+.btn-secondary:hover{background:var(--green-light);}
+.main{padding:0 1.5rem 6rem;max-width:940px;margin:0 auto;}
+.section-label{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.14em;color:var(--green);margin-bottom:0.4rem;}
+.section-title{font-family:'Barlow Condensed',sans-serif;font-size:2.6rem;font-weight:900;text-transform:uppercase;color:var(--text);line-height:1;margin-bottom:0.5rem;}
+.section-sub{font-size:0.95rem;color:var(--muted);margin-bottom:2.5rem;line-height:1.6;}
+.tab-bar{display:flex;gap:0;margin-bottom:1.5rem;border-bottom:2px solid var(--border);}
+.tab-btn{padding:0.85rem 1.5rem;font-family:'Barlow',sans-serif;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:all 0.2s;letter-spacing:0.06em;text-transform:uppercase;border-bottom:3px solid transparent;margin-bottom:-2px;}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green-lime);}
+.tab-btn:hover:not(.active){color:var(--green);}
+.form-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;box-shadow:0 2px 16px rgba(0,0,0,0.05);}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:7px;}
+.field.full{grid-column:1/-1;}
+label{font-size:0.72rem;font-weight:700;color:var(--text-mid);letter-spacing:0.08em;text-transform:uppercase;}
+select,input[type=text],input[type=email]{width:100%;padding:0.72rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.9rem;color:var(--text);background:var(--gray-bg);transition:border-color 0.2s;appearance:none;-webkit-appearance:none;}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+select:focus,input:focus{outline:none;border-color:var(--green-lime);}
+.chip-group{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{padding:6px 14px;border-radius:2px;border:1.5px solid var(--border);font-size:0.78rem;font-weight:700;cursor:pointer;background:var(--white);color:var(--muted);transition:all 0.15s;user-select:none;letter-spacing:0.04em;text-transform:uppercase;}
+.chip.selected{background:var(--green);color:var(--white);border-color:var(--green);}
+.chip:hover:not(.selected){border-color:var(--green);color:var(--green);}
+textarea{width:100%;padding:0.9rem 1rem;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.9rem;color:var(--text);background:var(--gray-bg);resize:vertical;min-height:100px;line-height:1.6;transition:border-color 0.2s;}
+textarea:focus{outline:none;border-color:var(--green-lime);}
+textarea::placeholder,input::placeholder{color:var(--muted);}
+.ai-input-section{margin-top:2rem;padding-top:2rem;border-top:1.5px solid var(--border);}
+.ai-label-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.ai-badge{font-size:0.65rem;font-weight:800;background:var(--green-lime);color:var(--white);padding:3px 10px;border-radius:2px;letter-spacing:0.1em;text-transform:uppercase;}
+.ai-label{font-size:0.72rem;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:0.08em;}
+.ai-sublabel{font-size:0.85rem;color:var(--muted);margin-bottom:0.75rem;line-height:1.6;}
+.ai-thinking{display:none;align-items:center;gap:10px;padding:0.75rem 1rem;background:var(--green-light);border:1px solid rgba(125,194,66,0.3);border-radius:var(--radius);margin-top:0.75rem;}
+.ai-thinking.visible{display:flex;}
+.ai-thinking-dots{display:flex;gap:4px;}
+.dot-anim{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 1.2s infinite;}
+.dot-anim:nth-child(2){animation-delay:0.2s;}
+.dot-anim:nth-child(3){animation-delay:0.4s;}
+@keyframes pulse{0%,80%,100%{opacity:0.3;transform:scale(0.8);}40%{opacity:1;transform:scale(1);}}
+.ai-thinking-text{font-size:0.82rem;color:var(--green);font-weight:600;}
+.submit-row{margin-top:2rem;}
+.btn-submit{width:100%;padding:1rem;background:var(--green);color:var(--white);font-family:'Barlow',sans-serif;font-size:0.95rem;font-weight:800;border:none;border-radius:var(--radius);cursor:pointer;transition:all 0.2s;letter-spacing:0.06em;text-transform:uppercase;}
+.btn-submit:hover{background:var(--green-mid);}
+.btn-submit:disabled{opacity:0.5;cursor:not-allowed;}
+.form-success{display:none;text-align:center;padding:2rem;background:var(--green-light);border-radius:var(--radius-lg);border:1px solid rgba(0,76,29,0.15);}
+.form-success.visible{display:block;animation:fadeUp 0.4s ease both;}
+.form-success-icon{font-size:2rem;color:var(--green);margin-bottom:0.75rem;}
+.form-success-title{font-family:'Barlow Condensed',sans-serif;font-size:1.6rem;font-weight:900;text-transform:uppercase;color:var(--green);margin-bottom:0.4rem;}
+.form-success-sub{font-size:0.88rem;color:var(--text-mid);line-height:1.6;}
+.result-section{display:none;margin-top:4rem;}
+.result-section.visible{display:block;animation:fadeUp 0.5s ease both;}
+.result-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.07);}
+.result-header{background:var(--green);padding:2rem;display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;}
+.score-gauge{position:relative;width:96px;height:96px;flex-shrink:0;}
+.score-gauge svg{transform:rotate(-90deg);}
+.score-gauge .track{fill:none;stroke:rgba(255,255,255,0.15);stroke-width:8;}
+.score-gauge .fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);}
+.score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:var(--white);line-height:1;}
+.score-num small{font-family:'Barlow',sans-serif;font-size:0.6rem;font-weight:600;color:rgba(255,255,255,0.6);margin-top:2px;letter-spacing:0.06em;text-transform:uppercase;}
+.mentor-info{flex:1;}
+.mentor-name{font-family:'Barlow Condensed',sans-serif;font-size:1.8rem;font-weight:900;color:var(--white);text-transform:uppercase;}
+.mentor-role{font-size:0.85rem;color:rgba(255,255,255,0.7);margin-top:4px;}
+.mentor-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.75rem;}
+.mentor-tag{font-size:0.68rem;font-weight:700;background:rgba(125,194,66,0.2);color:var(--green-lime);padding:3px 10px;border-radius:2px;letter-spacing:0.06em;text-transform:uppercase;border:1px solid rgba(125,194,66,0.3);}
+.ai-insight-box{margin:1.5rem 2rem 0;border-radius:var(--radius);overflow:hidden;border:1px solid rgba(0,76,29,0.2);}
+.ai-insight-header{background:var(--green);padding:0.65rem 1rem;display:flex;align-items:center;gap:8px;}
+.ai-insight-badge{font-size:0.65rem;font-weight:800;background:var(--green-lime);color:var(--white);padding:2px 8px;border-radius:2px;letter-spacing:0.1em;text-transform:uppercase;}
+.ai-insight-title{font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.08em;}
+.ai-insight-body{background:var(--green-light);padding:1rem 1.25rem;}
+.ai-insight-text{font-size:0.88rem;color:var(--text);line-height:1.65;}
+.bottleneck-correction{display:flex;align-items:center;gap:8px;margin-top:0.75rem;padding:0.6rem 0.9rem;background:var(--white);border-radius:var(--radius);border:1px solid rgba(0,76,29,0.15);}
+.correction-label{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;flex-shrink:0;}
+.correction-from{font-size:0.8rem;color:var(--muted);text-decoration:line-through;}
+.correction-arrow{font-size:0.9rem;color:var(--green);font-weight:900;}
+.correction-to{font-size:0.8rem;font-weight:800;color:var(--green);}
+.result-body{padding:2rem;}
+.reasons-title{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;}
+.reason{display:flex;gap:14px;align-items:flex-start;padding:1rem 1.25rem;border-radius:var(--radius);background:var(--gray-bg);border:1px solid var(--border);margin-bottom:0.75rem;}
+.reason:last-child{margin-bottom:0;}
+.reason-icon{width:28px;height:28px;flex-shrink:0;background:var(--green-light);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--green);font-weight:800;}
+.reason-text strong{font-size:0.88rem;font-weight:700;color:var(--text);display:block;margin-bottom:2px;}
+.reason-text span{font-size:0.82rem;color:var(--muted);line-height:1.5;}
+.score-breakdown{margin-top:1.75rem;padding-top:1.75rem;border-top:1px solid var(--border);}
+.breakdown-title{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted);margin-bottom:1rem;}
+.breakdown-row{display:flex;align-items:center;gap:12px;margin-bottom:0.65rem;}
+.breakdown-label{font-size:0.78rem;color:var(--muted);width:170px;flex-shrink:0;}
+.breakdown-bar-bg{flex:1;height:5px;background:var(--border);border-radius:99px;overflow:hidden;}
+.breakdown-bar-fill{height:100%;border-radius:99px;background:var(--green-lime);transition:width 1s cubic-bezier(.4,0,.2,1);}
+.breakdown-pct{font-size:0.8rem;font-weight:700;color:var(--green);width:36px;text-align:right;}
+.result-actions{padding:0 2rem 2rem;display:flex;gap:1rem;flex-wrap:wrap;}
+.btn-action{flex:1;min-width:160px;padding:0.9rem 1rem;border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.88rem;font-weight:800;cursor:pointer;transition:all 0.2s;text-align:center;letter-spacing:0.05em;text-transform:uppercase;}
+.btn-action.primary{background:var(--green);color:var(--white);border:none;}
+.btn-action.primary:hover{background:var(--green-mid);}
+.btn-action.ghost{background:transparent;color:var(--text-mid);border:1.5px solid var(--border);}
+.btn-action.ghost:hover{border-color:var(--green);color:var(--green);}
+.mentor-row{display:flex;align-items:center;gap:14px;padding:1rem 0;border-bottom:1px solid var(--border);}
+.mentor-row:last-child{border-bottom:none;}
+.mentor-avatar{width:44px;height:44px;border-radius:2px;background:var(--green);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:900;color:var(--white);flex-shrink:0;}
+.mentor-row-name{font-weight:700;font-size:0.92rem;color:var(--text);}
+.mentor-row-role{font-size:0.78rem;color:var(--muted);margin-top:2px;}
+.mtag{font-size:0.65rem;background:var(--green-light);color:var(--green);padding:2px 8px;border-radius:2px;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border:1px solid rgba(0,76,29,0.15);}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;max-width:480px;width:100%;animation:fadeUp 0.3s ease both;max-height:90vh;overflow-y:auto;box-shadow:0 16px 48px rgba(0,0,0,0.15);}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:0.4rem;}
+.modal-sub{font-size:0.88rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.6;}
+.modal-mentor-chip{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;font-weight:700;background:var(--green-light);color:var(--green);border:1px solid rgba(0,76,29,0.2);padding:4px 12px;border-radius:2px;margin-bottom:1.25rem;letter-spacing:0.05em;text-transform:uppercase;}
+.mfield{display:flex;flex-direction:column;gap:6px;margin-bottom:0.9rem;}
+.mfield label{font-size:0.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;}
+.mfield input,.mfield textarea{padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.9rem;background:var(--gray-bg);color:var(--text);}
+.mfield input:focus,.mfield textarea:focus{outline:none;border-color:var(--green-lime);}
+.mfield textarea{resize:vertical;min-height:72px;}
+.modal-actions{display:flex;gap:0.75rem;margin-top:1.25rem;}
+.modal-confirm{flex:1;padding:0.9rem;background:var(--green);color:var(--white);border:none;border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.9rem;font-weight:800;cursor:pointer;transition:background 0.2s;letter-spacing:0.05em;text-transform:uppercase;}
+.modal-confirm:hover{background:var(--green-mid);}
+.modal-cancel{padding:0.9rem 1.25rem;background:transparent;color:var(--muted);border:1.5px solid var(--border);border-radius:var(--radius);font-family:'Barlow',sans-serif;font-size:0.9rem;cursor:pointer;font-weight:600;}
+.modal-cancel:hover{border-color:var(--green);color:var(--green);}
+.modal-success{display:none;text-align:center;padding:1rem 0;}
+.modal-success.visible{display:block;}
+.success-icon{width:64px;height:64px;background:var(--green-light);border:2px solid var(--green-lime);border-radius:2px;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:1.6rem;color:var(--green);}
+.modal-success-title{font-family:'Barlow Condensed',sans-serif;font-size:2rem;font-weight:900;text-transform:uppercase;color:var(--text);margin-bottom:0.5rem;}
+.modal-success-sub{font-size:0.88rem;color:var(--muted);line-height:1.6;margin-bottom:1.5rem;}
+.epic-footer{text-align:center;padding:2.5rem 1.5rem;background:var(--green);margin-top:4rem;}
+.epic-footer-logo{font-family:'Barlow Condensed',sans-serif;font-size:1.3rem;font-weight:900;color:var(--white);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.4rem;}
+.epic-footer-sub{font-size:0.78rem;color:var(--green-lime);letter-spacing:0.08em;text-transform:uppercase;font-weight:600;}
+.divider{height:1px;background:var(--border);margin:4rem 0;}
+.content-wrapper{padding-top:108px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@media(max-width:768px){.top-bar-links{display:none;}.nav-links{display:none;}}
+@media(max-width:540px){.hero-stats{flex-direction:column;}.stat{border-right:none;border-bottom:1px solid var(--border);}.result-header{flex-direction:column;}.breakdown-label{width:120px;}}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="top-bar-links">
+    <span class="top-bar-link">Acerca del EPIC</span>
+    <span class="top-bar-link">Calendario</span>
+    <span class="top-bar-link">Red de Amigos</span>
+    <span class="top-bar-link">Reserva Espacio</span>
+    <span class="top-bar-link">Preguntas Frecuentes</span>
+  </div>
+  <div class="top-bar-right">MAD Fellows 2026</div>
+</div>
+<nav>
+  <div class="nav-logo">
+  <img
+    src="https://static.wixstatic.com/media/a5d52a_22540e9cba6d40bb8af5b86c73405f9a~mv2.jpg/v1/crop/x_0,y_173,w_900,h_553/fill/w_244,h_150,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/channels4_profile.jpg"
+    class="nav-logo-image"
+    alt="EPIC Lab logo"
+  >
+</div>
+  <div class="nav-links">
+    <span class="nav-link">Iniciativas</span>
+    <span class="nav-link active">MAD Fellowship 2026</span>
+    <span class="nav-link">Bootcamp 2026</span>
+    <span class="nav-link">Wake-Up Speaker Series</span>
+  </div>
+  <span class="nav-badge">MatchEPIC</span>
+</nav>
+
+<div class="content-wrapper">
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-shape-1"></div><div class="hero-shape-2"></div>
+    <div class="hero-shape-3"></div><div class="hero-shape-4"></div>
+    <div class="hero-content">
+      <div class="hero-tag">AI-Powered Mentor Allocation · EPIC Lab ITAM</div>
+      <h1>Match<span class="lime">EPIC</span><br><span class="dark">Find your mentor.</span></h1>
+      <p class="hero-sub">Connecting EPIC Lab founders with the right mentor at the right moment — powered by AI-driven compatibility scoring built for high-impact university ecosystems.</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">4</span><span class="stat-label">Sessions / cycle</span></div>
+        <div class="stat"><span class="stat-num">5</span><span class="stat-label">Weighted variables</span></div>
+        <div class="stat"><span class="stat-num">0→100</span><span class="stat-label">Fit score</span></div>
+        <div class="stat"><span class="stat-num">AI</span><span class="stat-label">Powered</span></div>
+      </div>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="scrollToTool()">Find my mentor →</button>
+        <button class="btn-secondary" onclick="switchTab('mentor',document.querySelectorAll('.tab-btn')[1]);scrollToTool();">Join as mentor</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="main" id="tool">
+    <div class="section-label">Allocation Engine</div>
+    <h2 class="section-title">Find your match</h2>
+    <p class="section-sub">Complete your profile and optionally describe your challenge in your own words. Our AI engine reads your description and refines the allocation.</p>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('founder',this)">I'm a Founder</button>
+      <button class="tab-btn" onclick="switchTab('mentor',this)">I'm a Mentor</button>
+      <button class="tab-btn" onclick="switchTab('network',this)">Mentor network</button>
+    </div>
+
+    <div id="tab-founder" class="form-card">
+      <div class="form-grid">
+        <div class="field">
+          <label>Startup stage</label>
+          <select id="f-stage">
+            <option value="">Select stage</option>
+            <option value="idea">Idea</option>
+            <option value="validation">Validation</option>
+            <option value="mvp">MVP</option>
+            <option value="traction">Early traction</option>
+            <option value="growth">Growth prep</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Sector</label>
+          <select id="f-sector">
+            <option value="">Select sector</option>
+            <option value="fintech">Fintech</option>
+            <option value="health">Healthtech</option>
+            <option value="saas">SaaS / B2B</option>
+            <option value="consumer">Consumer / Marketplace</option>
+            <option value="edtech">Edtech</option>
+            <option value="climate">Climate / Impact</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label>Primary bottleneck</label>
+          <div class="chip-group" id="f-bottleneck">
+            <span class="chip" data-val="customer_discovery">Customer discovery</span>
+            <span class="chip" data-val="value_prop">Value proposition</span>
+            <span class="chip" data-val="product">Product / MVP build</span>
+            <span class="chip" data-val="gtm">Go-to-market</span>
+            <span class="chip" data-val="financial_model">Financial model</span>
+            <span class="chip" data-val="fundraising">Fundraising</span>
+            <span class="chip" data-val="legal">Legal / Incorporation</span>
+          </div>
+        </div>
+        <div class="field full">
+          <label>Weekly availability</label>
+          <div class="chip-group" id="f-avail">
+            <span class="chip" data-val="1">Less than 1 hr</span>
+            <span class="chip" data-val="2">1–2 hrs</span>
+            <span class="chip" data-val="3">3+ hrs</span>
+          </div>
+        </div>
+      </div>
+      <div class="ai-input-section">
+        <div class="ai-label-row">
+          <span class="ai-badge">AI</span>
+          <span class="ai-label">Describe your challenge (optional — recommended)</span>
+        </div>
+        <p class="ai-sublabel">Write freely about your startup and what's blocking you. The AI engine reads this, identifies your real bottleneck, and refines the match beyond the structured fields.</p>
+        <textarea id="f-description" placeholder="e.g. We're building a fintech platform for SME credit scoring in Mexico. We have an MVP but struggle to get our first paying customers..."></textarea>
+        <div class="ai-thinking" id="ai-thinking">
+          <div class="ai-thinking-dots"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div></div>
+          <span class="ai-thinking-text">AI engine is analyzing your challenge...</span>
+        </div>
+      </div>
+      <div class="submit-row">
+        <button class="btn-submit" id="submit-btn" onclick="runMatch()">Generate compatibility match →</button>
+      </div>
+    </div>
+
+    <div id="tab-mentor" class="form-card" style="display:none;">
+      <div id="mentor-form-view">
+        <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1.75rem;line-height:1.6;">Join the EPIC Lab mentor network. Your profile will be matched with founders who need your specific expertise.</p>
+        <div class="form-grid">
+          <div class="field"><label>Full name</label><input type="text" id="m-name-input" placeholder="e.g. Carlos García"/></div>
+          <div class="field"><label>Current role & company</label><input type="text" id="m-role-input" placeholder="e.g. CFO @ Fintech MX"/></div>
+          <div class="field full"><label>Email</label><input type="email" id="m-email-input" placeholder="e.g. carlos.garcia@itam.mx"/></div>
+          <div class="field full">
+            <label>Primary expertise</label>
+            <div class="chip-group" id="m-expertise">
+              <span class="chip" data-val="customer_discovery">Customer discovery</span>
+              <span class="chip" data-val="value_prop">Value proposition</span>
+              <span class="chip" data-val="product">Product / Tech</span>
+              <span class="chip" data-val="gtm">Go-to-market</span>
+              <span class="chip" data-val="financial_model">Financial model</span>
+              <span class="chip" data-val="fundraising">Fundraising</span>
+              <span class="chip" data-val="legal">Legal / Incorporation</span>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Stage you mentor best</label>
+            <div class="chip-group" id="m-stage">
+              <span class="chip" data-val="idea">Idea</span>
+              <span class="chip" data-val="validation">Validation</span>
+              <span class="chip" data-val="mvp">MVP</span>
+              <span class="chip" data-val="traction">Early traction</span>
+              <span class="chip" data-val="growth">Growth prep</span>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Industries you've operated in</label>
+            <div class="chip-group" id="m-sector">
+              <span class="chip" data-val="fintech">Fintech</span>
+              <span class="chip" data-val="health">Healthtech</span>
+              <span class="chip" data-val="saas">SaaS / B2B</span>
+              <span class="chip" data-val="consumer">Consumer</span>
+              <span class="chip" data-val="edtech">Edtech</span>
+              <span class="chip" data-val="climate">Climate</span>
+              <span class="chip" data-val="other">Other</span>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Weekly availability</label>
+            <div class="chip-group" id="m-avail">
+              <span class="chip" data-val="1">Less than 1 hr</span>
+              <span class="chip" data-val="2">1–2 hrs</span>
+              <span class="chip" data-val="3">3+ hrs</span>
+            </div>
+          </div>
+          <div class="field full">
+            <label>Brief bio (optional)</label>
+            <textarea id="m-bio" placeholder="Tell founders about your background and what you love helping with..." style="min-height:80px;"></textarea>
+          </div>
+        </div>
+        <div class="submit-row"><button class="btn-submit" onclick="submitMentorProfile()">Join the mentor network →</button></div>
+      </div>
+      <div class="form-success" id="mentor-success">
+        <div class="form-success-icon">✓</div>
+        <div class="form-success-title">Profile submitted!</div>
+        <p class="form-success-sub">Welcome to the EPIC Lab mentor network. The team will review your profile and activate it within 24 hours. You'll receive confirmation at your email.</p>
+      </div>
+    </div>
+
+    <div id="tab-network" class="form-card" style="display:none;">
+      <p style="font-size:0.88rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6;">Active EPIC Lab mentor profiles available for matching. In a full deployment, mentors onboard via the <strong style="color:var(--text)">I'm a Mentor</strong> tab.</p>
+      <div id="mentor-list"></div>
+    </div>
+
+    <div class="result-section" id="result-section">
+      <div class="divider"></div>
+      <div class="section-label">Match result</div>
+      <h2 class="section-title">Your optimal mentor</h2>
+      <p class="section-sub" id="result-subtitle"></p>
+      <div class="result-card">
+        <div class="result-header">
+          <div class="score-gauge">
+            <svg width="96" height="96" viewBox="0 0 96 96">
+              <circle class="track" cx="48" cy="48" r="40"/>
+              <circle class="fill" id="gauge-fill" cx="48" cy="48" r="40" stroke="#7dc242" stroke-dasharray="251" stroke-dashoffset="251"/>
+            </svg>
+            <div class="score-num"><span id="score-display">--</span><small>/ 100</small></div>
+          </div>
+          <div class="mentor-info">
+            <div class="mentor-name" id="m-result-name">—</div>
+            <div class="mentor-role" id="m-result-role">—</div>
+            <div class="mentor-tags" id="m-result-tags"></div>
+          </div>
+        </div>
+
+        <div class="ai-insight-box" id="ai-insight-box" style="display:none;">
+          <div class="ai-insight-header">
+            <span class="ai-insight-badge">AI</span>
+            <span class="ai-insight-title">Analysis of your challenge</span>
+          </div>
+          <div class="ai-insight-body">
+            <div class="ai-insight-text" id="ai-insight-text"></div>
+            <div class="bottleneck-correction" id="bottleneck-correction" style="display:none;">
+              <span class="correction-label">Bottleneck corrected:</span>
+              <span class="correction-from" id="correction-from"></span>
+              <span class="correction-arrow">→</span>
+              <span class="correction-to" id="correction-to"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="result-body">
+          <div class="reasons-title">Why this match</div>
+          <div id="reasons-list"></div>
+          <div class="score-breakdown">
+            <div class="breakdown-title">Compatibility breakdown</div>
+            <div id="breakdown-bars"></div>
+          </div>
+        </div>
+        <div class="result-actions">
+          <button class="btn-action primary" onclick="openModal()">Request introduction →</button>
+          <button class="btn-action ghost" onclick="resetResult()">Run another match</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="epic-footer">
+    <div class="epic-footer-logo">EPIC Lab · ITAM</div>
+    <div class="epic-footer-sub">Emprender · Progresar · Innovar · Crear</div>
+  </footer>
+</div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div id="modal-form-view">
+      <div class="modal-title">Request intro</div>
+      <p class="modal-sub">The EPIC Lab team will review your request and connect you with your matched mentor within 48 hours.</p>
+      <div class="modal-mentor-chip">Matched mentor: <strong id="modal-mentor-name">—</strong></div>
+      <div class="mfield"><label>Your full name</label><input type="text" id="req-name" placeholder="e.g. Ana García Martínez"/></div>
+      <div class="mfield"><label>Email</label><input type="email" id="req-email" placeholder="e.g. ana.garcia@itam.mx"/></div>
+      <div class="mfield"><label>Startup name</label><input type="text" id="req-startup" placeholder="e.g. CreditSME"/></div>
+      <div class="mfield"><label>What do you hope to achieve? (optional)</label><textarea id="req-message" placeholder="Be specific — the more context, the better your first session."></textarea></div>
+      <div class="modal-actions">
+        <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-confirm" onclick="submitRequest()">Send request →</button>
+      </div>
+    </div>
+    <div class="modal-success" id="modal-success-view">
+      <div class="success-icon">✓</div>
+      <div class="modal-success-title">Request sent!</div>
+      <p class="modal-success-sub">The EPIC Lab team will connect you with <strong id="success-mentor-name"></strong> within 48 hours. Check your email for next steps.</p>
+      <button class="modal-confirm" onclick="closeModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── MENTOR DATABASE ───────────────────────────────────────────────────────────
+const MENTORS = [
+  { id:1, name:"Alejandra Ríos",  role:"CFO @ Kueski · ITAM Alumni",       expertise:["financial_model","fundraising","legal"],        stages:["mvp","traction","growth"],      sectors:["fintech","saas","consumer"],          availability:2, leverage:4, tags:["Finance","Fundraising","Fintech"] },
+  { id:2, name:"Carlos Mendoza",  role:"Co-founder @ Clip · Growth Advisor",expertise:["gtm","customer_discovery","value_prop"],        stages:["validation","mvp","traction"],  sectors:["consumer","fintech","saas"],           availability:2, leverage:4, tags:["GTM","Growth","Consumer"] },
+  { id:3, name:"Sofía Garza",     role:"Partner @ ALLVP · ITAM Alumni",     expertise:["fundraising","financial_model","gtm"],          stages:["traction","growth"],            sectors:["saas","fintech","health"],             availability:1, leverage:5, tags:["Venture Capital","Fundraising","SaaS"] },
+  { id:4, name:"Diego Herrera",   role:"CTO & Founder @ Conekta",           expertise:["product","customer_discovery","value_prop"],    stages:["idea","validation","mvp"],      sectors:["fintech","saas","other"],              availability:3, leverage:3, tags:["Product","Tech","Fintech"] },
+  { id:5, name:"Mariana Vega",    role:"Legal Counsel @ Startup México",     expertise:["legal","financial_model","customer_discovery"], stages:["idea","validation","mvp"],      sectors:["health","edtech","climate","other"],   availability:3, leverage:2, tags:["Legal","Incorporation","Early stage"] }
+];
+
+const WEIGHTS = { need_expertise:0.35, stage_alignment:0.25, availability:0.15, industry:0.15, leverage:0.10 };
+
+const BOTTLENECK_LABELS = {
+  customer_discovery:"Customer discovery", value_prop:"Value proposition",
+  product:"Product / MVP build", gtm:"Go-to-market",
+  financial_model:"Financial modeling", fundraising:"Fundraising", legal:"Legal & incorporation"
+};
+
+// ── LOCAL AI ENGINE — keyword-based NLP (works offline, no CORS) ──────────────
+// Keyword signals per bottleneck category
+const BOTTLENECK_SIGNALS = {
+  customer_discovery: [
+    "talk to users","user interviews","haven't talked","not talked","no users","find users",
+    "potential customers","target market","who is our customer","don't know our customer",
+    "understand the problem","is the problem real","is the problem big enough","market research",
+    "customer interviews","pain point","before we build","need to validate","don't know if"
+  ],
+  value_prop: [
+    "value proposition","differentiation","why us","competitive advantage","unique value",
+    "positioning","why choose us","what makes us different","stand out","not clear what we offer",
+    "messaging","how do we differentiate","unclear proposition"
+  ],
+  product: [
+    "develop the product","build the product","build our product","build our MVP",
+    "technical debt","prototype","feature roadmap","product roadmap","engineering","code",
+    "tech stack","software architecture","launch product","ship product",
+    "backend","frontend","api","database","infrastructure"
+  ],
+  gtm: [
+    "first customers","first 10 customers","first sales","first paying","acquire customers",
+    "customer acquisition","reach customers","go to market","go-to-market",
+    "sales channel","distribution channel","outreach","how to sell","who to sell to",
+    "sales process","marketing strategy","grow revenue","generate revenue",
+    "get traction","reach our target","find customers","build trust with customers",
+    "build trust with clients","build trust with sme","trust with","sme","b2b sales",
+    "cannot figure out how to reach","can't figure out how to reach","regulated market",
+    "sales motion","inbound","outbound","lead generation","pipeline"
+  ],
+  financial_model: [
+    "financial model","unit economics","pricing strategy","revenue model","gross margins",
+    "burn rate","runway","P&L","cash flow","valuation","financial projections",
+    "monetize","monetization","business model","cost structure","LTV","CAC","payback"
+  ],
+  fundraising: [
+    "raise capital","fundraising","raise a round","investors","pitch deck","seed round",
+    "series a","series b","venture capital","angel investors","investment round",
+    "funding round","investor meetings","term sheet","due diligence","cap table"
+  ],
+  legal: [
+    "legal structure","incorporate","company structure","legal contracts","IP protection",
+    "intellectual property","compliance","regulatory approval","regulation",
+    "terms of service","privacy policy","trademark","patent","incorporation",
+    "legal entity","corporate structure"
+  ]
+};
+
+// Context phrases that neutralize "build" as a product signal
+const BUILD_NEUTRALIZERS = [
+  "build trust","build relationships","build credibility","build a customer",
+  "build client","build rapport","build pipeline","build sales","build revenue"
+];
+
+// Score how strongly the text signals each bottleneck
+function detectBottleneck(text) {
+  const lower = text.toLowerCase();
+
+  // Neutralize ambiguous "build" phrases before scoring
+  let cleaned = lower;
+  BUILD_NEUTRALIZERS.forEach(phrase => {
+    cleaned = cleaned.replace(new RegExp(phrase, 'g'), '[neutral]');
+  });
+
+  const scores = {};
+  for (const [key, signals] of Object.entries(BOTTLENECK_SIGNALS)) {
+    scores[key] = signals.reduce((acc, kw) => acc + (cleaned.includes(kw.toLowerCase()) ? 1 : 0), 0);
+  }
+
+  const top = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+  // Only override if detected score is meaningfully higher (threshold: at least 1 signal)
+  return { detected: top[0][0], score: top[0][1], scores };
+}
+
+// Generate mentor boosts based on detected bottleneck + sector signals
+function generateBoosts(detectedBottleneck, text, founderSector) {
+  const lower = text.toLowerCase();
+  const boosts = { 1:{}, 2:{}, 3:{}, 4:{}, 5:{} };
+
+  // Mentor 1: Alejandra Ríos — finance/fundraising/legal
+  if (["financial_model","fundraising","legal"].includes(detectedBottleneck)) {
+    boosts[1].need = detectedBottleneck === "financial_model" ? 20 : detectedBottleneck === "fundraising" ? 18 : 15;
+  }
+  if (["fintech","saas","consumer"].includes(founderSector)) boosts[1].industry = 15;
+
+  // Mentor 2: Carlos Mendoza — gtm/customer_discovery/value_prop
+  if (["gtm","customer_discovery","value_prop"].includes(detectedBottleneck)) {
+    boosts[2].need = detectedBottleneck === "gtm" ? 22 : 16;
+  }
+  if (lower.includes("sme") || lower.includes("b2b") || lower.includes("sales")) boosts[2].need = (boosts[2].need||0) + 5;
+
+  // Mentor 3: Sofía Garza — fundraising/gtm (VC)
+  if (["fundraising","financial_model"].includes(detectedBottleneck)) {
+    boosts[3].need = 18;
+  }
+  if (lower.includes("investor") || lower.includes("raise") || lower.includes("pitch")) boosts[3].need = (boosts[3].need||0) + 8;
+
+  // Mentor 4: Diego Herrera — product/customer_discovery
+  if (["product","customer_discovery","value_prop"].includes(detectedBottleneck)) {
+    boosts[4].need = detectedBottleneck === "product" ? 18 : detectedBottleneck === "customer_discovery" ? 20 : 12;
+  }
+  if (lower.includes("haven't talked") || lower.includes("not talked") || lower.includes("no users") || lower.includes("before we build")) {
+    boosts[4].need = (boosts[4].need||0) + 8;
+  }
+
+  // Mentor 5: Mariana Vega — legal/early stage/health
+  if (["legal","customer_discovery"].includes(detectedBottleneck)) {
+    boosts[5].need = detectedBottleneck === "legal" ? 20 : 15;
+  }
+  if (["health","edtech","climate"].includes(founderSector)) boosts[5].industry = 18;
+  if (lower.includes("haven't talked") || lower.includes("not talked") || lower.includes("before we build") || lower.includes("is the problem real")) {
+    boosts[5].need = (boosts[5].need||0) + 10;
+  }
+
+  return boosts;
+}
+
+// Generate human-readable AI insight
+function generateInsight(detectedBottleneck, text, founderStage, founderSector) {
+  const lower = text.toLowerCase();
+
+  const insights = {
+    customer_discovery: `The founder's core challenge is market validation — they need to talk to real users before building further. The priority is finding someone who can guide structured customer discovery at the ${founderStage} stage in ${founderSector}.`,
+    value_prop:         `The startup struggles to articulate a clear differentiation. The right mentor has experience sharpening value propositions and competitive positioning, ideally in the ${founderSector} space.`,
+    product:            `The team's bottleneck is on the product and build side. They need a mentor with hands-on experience taking a product from concept to launch, especially at the ${founderStage} stage.`,
+    gtm:                `Despite having a validated idea, the founder can't crack customer acquisition. The ideal mentor has direct experience building GTM motion from zero, specifically in ${founderSector} or B2B contexts.`,
+    financial_model:    `The startup needs help structuring its financial model and unit economics. The right mentor has CFO-level experience in ${founderSector} and can help build defensible projections.`,
+    fundraising:        `The founder is preparing to raise and needs a mentor who has navigated investor relationships, pitch construction, and term sheet dynamics — ideally with VC-side experience.`,
+    legal:              `The startup has early-stage legal and incorporation questions. The ideal mentor can guide company structure, compliance, and IP protection in the ${founderSector} context.`
+  };
+
+  // Enrich if specific keywords found
+  let base = insights[detectedBottleneck] || insights.customer_discovery;
+  if (lower.includes("sme") || lower.includes("regulated") || lower.includes("regulation")) {
+    base += " The regulated market context adds complexity — sector-specific experience is essential.";
+  }
+  return base;
+}
+
+// ── SCORING ENGINE ────────────────────────────────────────────────────────────
+function scoreNeed(founderBottleneck, mentorExpertise) {
+  if (mentorExpertise[0] === founderBottleneck) return 92;
+  if (mentorExpertise.slice(1).includes(founderBottleneck)) return 68;
+  if (mentorExpertise.some(e => isRelated(e, founderBottleneck))) return 44;
+  return 10;
+}
+function scoreStage(founderStage, mentorStages) {
+  const order = ["idea","validation","mvp","traction","growth"];
+  const fi = order.indexOf(founderStage);
+  if (mentorStages.includes(founderStage)) return 88;
+  if (mentorStages.some(s => Math.abs(order.indexOf(s) - fi) === 1)) return 58;
+  if (mentorStages.some(s => Math.abs(order.indexOf(s) - fi) === 2)) return 32;
+  return 10;
+}
+function scoreAvailability(founderAvail, mentorAvail) {
+  const diff = mentorAvail - founderAvail;
+  if (diff >= 0)  return 88;
+  if (diff === -1) return 55;
+  return 20;
+}
+function scoreIndustry(founderSector, mentorSectors) {
+  if (mentorSectors[0] === founderSector)            return 90;
+  if (mentorSectors.slice(1).includes(founderSector)) return 65;
+  if (mentorSectors.includes('other'))                return 35;
+  return 15;
+}
+function scoreLeverage(leverage) { return 38 + (leverage - 1) * 12; }
+
+function isRelated(a, b) {
+  return [["financial_model","fundraising","legal"],["customer_discovery","value_prop","gtm"],["product","customer_discovery","value_prop"]]
+    .some(g => g.includes(a) && g.includes(b));
+}
+
+function scoreMatch(founder, mentor, boosts = {}) {
+  let need     = scoreNeed(founder.bottleneck, mentor.expertise);
+  let stage    = scoreStage(founder.stage, mentor.stages);
+  let avail    = scoreAvailability(founder.availability, mentor.availability);
+  let industry = scoreIndustry(founder.sector, mentor.sectors);
+  let leverage = scoreLeverage(mentor.leverage);
+
+  if (boosts[mentor.id]) {
+    const b = boosts[mentor.id];
+    need     = Math.min(97, need     + (b.need     || 0));
+    stage    = Math.min(97, stage    + (b.stage    || 0));
+    industry = Math.min(97, industry + (b.industry || 0));
+  }
+
+  const total = Math.round(
+    need     * WEIGHTS.need_expertise  +
+    stage    * WEIGHTS.stage_alignment +
+    avail    * WEIGHTS.availability    +
+    industry * WEIGHTS.industry        +
+    leverage * WEIGHTS.leverage
+  );
+  return { total, breakdown: {
+    "Need–expertise fit":   Math.round(need),
+    "Stage alignment":      Math.round(stage),
+    "Availability fit":     Math.round(avail),
+    "Industry familiarity": Math.round(industry),
+    "Mentor leverage":      Math.round(leverage)
+  }};
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let aiAnalysis = null;
+let originalBottleneck = null;
+
+// ── RUN MATCH ────────────────────────────────────────────────────────────────
+function runMatch() {
+  const stage      = document.getElementById('f-stage').value;
+  const sector     = document.getElementById('f-sector').value;
+  const bottleneck = getChipVal('f-bottleneck');
+  const availStr   = getChipVal('f-avail');
+  const description= document.getElementById('f-description').value.trim();
+
+  if (!stage || !sector || !bottleneck || !availStr) {
+    alert('Please complete all required fields before generating your match.');
+    return;
+  }
+
+  originalBottleneck = bottleneck;
+  aiAnalysis = null;
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Analyzing...';
+
+  // Simulate processing time for UX
+  const hasText = description.length > 20;
+  const delay = hasText ? 1400 : 300;
+
+  if (hasText) {
+    document.getElementById('ai-thinking').classList.add('visible');
+  }
+
+  setTimeout(() => {
+    const founder = { stage, sector, bottleneck, availability: parseInt(availStr) };
+    let boosts = {};
+
+    if (hasText) {
+      document.getElementById('ai-thinking').classList.remove('visible');
+
+      // Run local NLP analysis
+      const detection = detectBottleneck(description);
+      // Only override if: detected has at least 2 signals, OR detected score is strictly higher than 0
+      // AND the detected bottleneck is actually different from what user selected
+      const detectedBN = (detection.score >= 2 && detection.detected !== bottleneck)
+        ? detection.detected
+        : (detection.score === 1 && detection.detected !== bottleneck && detection.scores[bottleneck] === 0)
+          ? detection.detected
+          : bottleneck;
+      const changed = detectedBN !== bottleneck;
+
+      aiAnalysis = {
+        insight: generateInsight(detectedBN, description, stage, sector),
+        detectedBottleneck: detectedBN,
+        bottleneckChanged: changed
+      };
+
+      boosts = generateBoosts(detectedBN, description, sector);
+
+      // Override bottleneck for scoring if AI detected something different
+      if (changed) founder.bottleneck = detectedBN;
+    }
+
+    const scored = MENTORS.map(m => ({ mentor: m, result: scoreMatch(founder, m, boosts) }));
+    scored.sort((a, b) => b.result.total - a.result.total);
+
+    btn.disabled = false;
+    btn.textContent = 'Generate compatibility match →';
+
+    showResult(founder, scored[0].mentor, scored[0].result, hasText);
+  }, delay);
+}
+
+// ── SHOW RESULT ───────────────────────────────────────────────────────────────
+function showResult(founder, mentor, result, hasAIText) {
+  const sec = document.getElementById('result-section');
+  sec.classList.add('visible');
+  setTimeout(() => sec.scrollIntoView({ behavior:'smooth', block:'start' }), 100);
+
+  const stageLabels = { idea:"Idea", validation:"Validation", mvp:"MVP", traction:"Early traction", growth:"Growth prep" };
+  document.getElementById('result-subtitle').textContent =
+    `Based on your ${stageLabels[founder.stage]||founder.stage} stage startup in ${founder.sector}${hasAIText ? ' — refined by AI analysis of your description' : ''}.`;
+
+  // Gauge animation
+  const score = result.total;
+  setTimeout(() => { document.getElementById('gauge-fill').style.strokeDashoffset = 251 - (score/100)*251; }, 100);
+  animateNumber('score-display', 0, score, 1200);
+
+  // Mentor info
+  document.getElementById('m-result-name').textContent = mentor.name;
+  document.getElementById('m-result-role').textContent = mentor.role;
+  document.getElementById('m-result-tags').innerHTML = mentor.tags.map(t => `<span class="mentor-tag">${t}</span>`).join('');
+  document.getElementById('modal-mentor-name').textContent = mentor.name;
+  document.getElementById('success-mentor-name').textContent = mentor.name;
+
+  // AI INSIGHT BOX — always show when text was provided
+  const insightBox = document.getElementById('ai-insight-box');
+  if (hasAIText && aiAnalysis) {
+    insightBox.style.display = 'block';
+    document.getElementById('ai-insight-text').textContent = aiAnalysis.insight;
+
+    const correctionEl = document.getElementById('bottleneck-correction');
+    if (aiAnalysis.bottleneckChanged) {
+      correctionEl.style.display = 'flex';
+      document.getElementById('correction-from').textContent = BOTTLENECK_LABELS[originalBottleneck] || originalBottleneck;
+      document.getElementById('correction-to').textContent   = BOTTLENECK_LABELS[aiAnalysis.detectedBottleneck] || aiAnalysis.detectedBottleneck;
+    } else {
+      correctionEl.style.display = 'none';
+    }
+  } else {
+    insightBox.style.display = 'none';
+  }
+
+  // Match reasons
+  const bd = result.breakdown;
+  const reasons = [];
+
+  if (bd["Need–expertise fit"] >= 80) {
+    reasons.push({ icon:"✓", title:`Strong expertise in ${BOTTLENECK_LABELS[founder.bottleneck]||founder.bottleneck}`, detail:`${mentor.name.split(' ')[0]} has hands-on experience solving your exact bottleneck — directly applicable to your current stage.` });
+  } else if (bd["Need–expertise fit"] >= 50) {
+    reasons.push({ icon:"~", title:`Relevant expertise for ${BOTTLENECK_LABELS[founder.bottleneck]||founder.bottleneck}`, detail:`${mentor.name.split(' ')[0]}'s background covers closely related areas — their experience will still move your startup forward.` });
+  } else {
+    reasons.push({ icon:"→", title:`Complementary perspective on your challenge`, detail:`This mentor brings a different angle that can help reframe the problem — sometimes the best mentor challenges your assumptions.` });
+  }
+
+  const sl = { idea:"Idea", validation:"Validation", mvp:"MVP", traction:"Early traction", growth:"Growth prep" };
+  if (bd["Stage alignment"] >= 80) {
+    reasons.push({ icon:"✓", title:`Matched to ${sl[founder.stage]||founder.stage} stage startups`, detail:`This mentor has built and advised companies at exactly your stage — guidance will be specific, not generic.` });
+  } else if (bd["Stage alignment"] >= 50) {
+    reasons.push({ icon:"→", title:`Prepares you for the next stage`, detail:`${mentor.name.split(' ')[0]} typically mentors companies slightly ahead — a forward-looking perspective for where you're headed.` });
+  } else {
+    reasons.push({ icon:"~", title:`Cross-stage learning opportunity`, detail:`Their experience at a different stage gives you visibility into future challenges — valuable for long-term planning.` });
+  }
+
+  if (bd["Availability fit"] >= 80) {
+    reasons.push({ icon:"✓", title:`Availability aligned for EPIC's 4-session cycle`, detail:`Their weekly bandwidth matches your commitment — optimal for the structured mentorship program without wasted capacity.` });
+  } else {
+    reasons.push({ icon:"✓", title:`High-leverage mentor with focused time`, detail:`Lower availability is offset by depth of expertise — each session delivers concentrated, high-ROI guidance.` });
+  }
+
+  document.getElementById('reasons-list').innerHTML = reasons.map(r => `
+    <div class="reason">
+      <div class="reason-icon">${r.icon}</div>
+      <div class="reason-text"><strong>${r.title}</strong><span>${r.detail}</span></div>
+    </div>`).join('');
+
+  // Breakdown bars
+  const wl = { "Need–expertise fit":"35%","Stage alignment":"25%","Availability fit":"15%","Industry familiarity":"15%","Mentor leverage":"10%" };
+  document.getElementById('breakdown-bars').innerHTML = Object.entries(result.breakdown).map(([k,v]) => `
+    <div class="breakdown-row">
+      <div class="breakdown-label">${k} <span style="font-size:0.68rem;opacity:0.6;">(${wl[k]})</span></div>
+      <div class="breakdown-bar-bg"><div class="breakdown-bar-fill" style="width:0%" data-target="${v}"></div></div>
+      <div class="breakdown-pct">${v}</div>
+    </div>`).join('');
+  setTimeout(() => document.querySelectorAll('.breakdown-bar-fill').forEach(b => b.style.width = b.dataset.target + '%'), 200);
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal() { document.getElementById('modal-form-view').style.display='block'; document.getElementById('modal-success-view').classList.remove('visible'); document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); ['req-name','req-email','req-startup','req-message'].forEach(id => document.getElementById(id).value=''); }
+function handleOverlayClick(e) { if (e.target===document.getElementById('modal-overlay')) closeModal(); }
+function submitRequest() {
+  const name=document.getElementById('req-name').value.trim();
+  const email=document.getElementById('req-email').value.trim();
+  const startup=document.getElementById('req-startup').value.trim();
+  if (!name||!email||!startup) { alert('Please fill in your name, email, and startup name.'); return; }
+  document.getElementById('modal-form-view').style.display='none';
+  document.getElementById('modal-success-view').classList.add('visible');
+}
+
+// ── MENTOR FORM ───────────────────────────────────────────────────────────────
+function submitMentorProfile() {
+  const name=document.getElementById('m-name-input').value.trim();
+  const role=document.getElementById('m-role-input').value.trim();
+  const email=document.getElementById('m-email-input').value.trim();
+  const expertise=getChipVal('m-expertise');
+  const stage=getChipVal('m-stage');
+  const sector=getChipVal('m-sector');
+  const avail=getChipVal('m-avail');
+  if (!name||!role||!email||!expertise||!stage||!sector||!avail) { alert('Please complete all required fields.'); return; }
+  document.getElementById('mentor-form-view').style.display='none';
+  document.getElementById('mentor-success').classList.add('visible');
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['founder','mentor','network'].forEach(t => document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none');
+  if (tab==='network') renderMentorList();
+}
+function renderMentorList() {
+  document.getElementById('mentor-list').innerHTML = MENTORS.map(m => `
+    <div class="mentor-row">
+      <div class="mentor-avatar">${m.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div style="flex:1;">
+        <div class="mentor-row-name">${m.name}</div>
+        <div class="mentor-row-role">${m.role}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${m.tags.map(t=>`<span class="mtag">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+const multiGroups = ['m-sector','m-stage'];
+document.querySelectorAll('.chip-group').forEach(g => {
+  g.addEventListener('click', e => {
+    const c = e.target.closest('.chip');
+    if (!c) return;
+    if (multiGroups.includes(g.id)) { c.classList.toggle('selected'); }
+    else { g.querySelectorAll('.chip').forEach(x => x.classList.remove('selected')); c.classList.add('selected'); }
+  });
+});
+function getChipVal(id) { const s=document.querySelector(`#${id} .chip.selected`); return s?s.dataset.val:null; }
+function animateNumber(id, from, to, dur) {
+  const el=document.getElementById(id); const start=performance.now();
+  function step(now) { const p=Math.min((now-start)/dur,1); el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-p,3))); if(p<1)requestAnimationFrame(step); }
+  requestAnimationFrame(step);
+}
+function resetResult() {
+  document.getElementById('result-section').classList.remove('visible');
+  document.getElementById('f-stage').value=''; document.getElementById('f-sector').value=''; document.getElementById('f-description').value='';
+  document.querySelectorAll('#tab-founder .chip.selected').forEach(c=>c.classList.remove('selected'));
+  aiAnalysis=null; window.scrollTo({top:0,behavior:'smooth'});
+}
+function scrollToTool() { document.getElementById('tool').scrollIntoView({behavior:'smooth'}); }
+</script>
+</body>
+</html>
